@@ -59,23 +59,6 @@ body, html {
   fill: #FFFFFF;
 }
 
-mux-player {
-  width: 100%;
-  height: auto;
-  --live-button: none;
-  --seek-backward-button: none;
-  --seek-forward-button: none;
-  --mute-button: none;
-  --captions-button: none;
-  --airplay-button: none;
-  --pip-button: none;
-  --fullscreen-button: none;
-  --cast-button: none;
-  --playback-rate-button: none;
-  --volume-range: none;
-  --rendition-selectmenu: none;
-}
-
 .fullscreen-overlay {
   display: none;
   position: fixed;
@@ -100,12 +83,7 @@ mux-player {
   align-items: center;
   width: 56.25vh; /* 9/16 aspect ratio */
   scroll-snap-align: center; /* Snap earlier */
-}
-
-.fullscreen-video {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
+  background-color: grey; /* Placeholder background color */
 }
 
 .close-button {
