@@ -31,17 +31,17 @@ async function initializeVideoCarousel(config) {
 
     updateCarousel();
 
-    function createVideoElement(data, index) {
-      const videoContainer = document.createElement('div');
-      videoContainer.className = 'fullscreen-video-container';
-      videoContainer.innerHTML = `
+    function createVideoContainer(index) {
+      const container = document.createElement('div');
+      container.className = 'fullscreen-video-container';
+      container.innerHTML = `
         <mux-player
           class="fullscreen-video"
           playback-id="${data[index].playback_id}"
           metadata-video-title="${data[index].title}"
           metadata-viewer-user-id="user"
         ></mux-player>`;
-      return videoContainer;
+      return container;
     }
 
     function openOverlay(index) {
@@ -49,9 +49,20 @@ async function initializeVideoCarousel(config) {
       overlay.innerHTML = ''; // Clear previous videos
       overlay.style.display = 'flex';
 
-      const currentVideo = createVideoElement(data, index);
-      overlay.appendChild(currentVideo);
+      const currentContainer = createVideoContainer(index);
+      overlay.appendChild(currentContainer);
 
+      if (index < data.length - 1) {
+        const nextContainer = createVideoContainer(index + 1);
+        overlay.appendChild(nextContainer);
+      }
+
+      if (index > 0) {
+        const prevContainer = createVideoContainer(index - 1);
+        overlay.appendChild(prevContainer);
+      }
+
+      overlay.scrollTop = 0;
       setupScrollHandler(data, index);
     }
 
@@ -67,19 +78,17 @@ async function initializeVideoCarousel(config) {
           currentIndex++;
           if (currentIndex < data.length) {
             overlay.innerHTML = '';
-            const currentVideo = createVideoElement(data, currentIndex);
-            overlay.appendChild(currentVideo);
+            const currentContainer = createVideoContainer(currentIndex);
+            overlay.appendChild(currentContainer);
 
             if (currentIndex < data.length - 1) {
-              const nextVideo = createVideoElement(data, currentIndex + 1);
-              nextVideo.style.display = 'none';
-              overlay.appendChild(nextVideo);
+              const nextContainer = createVideoContainer(currentIndex + 1);
+              overlay.appendChild(nextContainer);
             }
 
             if (currentIndex > 0) {
-              const prevVideo = createVideoElement(data, currentIndex - 1);
-              prevVideo.style.display = 'none';
-              overlay.appendChild(prevVideo);
+              const prevContainer = createVideoContainer(currentIndex - 1);
+              overlay.appendChild(prevContainer);
             }
             overlay.scrollTop = 0;
           } else {
@@ -89,19 +98,17 @@ async function initializeVideoCarousel(config) {
           currentIndex--;
           if (currentIndex >= 0) {
             overlay.innerHTML = '';
-            const currentVideo = createVideoElement(data, currentIndex);
-            overlay.appendChild(currentVideo);
+            const currentContainer = createVideoContainer(currentIndex);
+            overlay.appendChild(currentContainer);
 
             if (currentIndex < data.length - 1) {
-              const nextVideo = createVideoElement(data, currentIndex + 1);
-              nextVideo.style.display = 'none';
-              overlay.appendChild(nextVideo);
+              const nextContainer = createVideoContainer(currentIndex + 1);
+              overlay.appendChild(nextContainer);
             }
 
             if (currentIndex > 0) {
-              const prevVideo = createVideoElement(data, currentIndex - 1);
-              prevVideo.style.display = 'none';
-              overlay.appendChild(prevVideo);
+              const prevContainer = createVideoContainer(currentIndex - 1);
+              overlay.appendChild(prevContainer);
             }
             overlay.scrollTop = windowHeight;
           } else {
