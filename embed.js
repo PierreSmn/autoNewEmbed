@@ -4,8 +4,7 @@
   window.MyVideoCarouselConfig = window.MyVideoCarouselConfig || {
     playButtonColor: '#0000FF',
     integrationId: null, // Default value, should be set by the customer
-    numVideos: 5, // Default value
-    disableClick: false // Default value is false
+    numVideos: 5 // Default value
   };
 
   const supabaseUrl = 'https://pifcxlqwffdrqcwggoqb.supabase.co/rest/v1/integrations';
@@ -67,11 +66,11 @@
 
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'https://embeded-pi.vercel.app/styles.css';
+    link.href = 'https://auto-new-embed.vercel.app/styles.css';
     document.head.appendChild(link);
 
     var customScript = document.createElement('script');
-    customScript.src = 'https://embeded-pi.vercel.app/script.js';
+    customScript.src = 'https://auto-new-embed.vercel.app/script.js';
     customScript.async = true;
     customScript.onload = function() {
       console.log('Custom script loaded');
@@ -102,22 +101,6 @@
             <path fill-rule="evenodd" clip-rule="evenodd" d="M12.0002 10.586L4.70718 3.29297L3.29297 4.70718L10.586 12.0002L3.29297 19.2933L4.70718 20.7075L12.0002 13.4145L19.2933 20.7075L20.7075 19.2933L13.4145 12.0002L20.7075 4.70723L19.2933 3.29302L12.0002 10.586Z" fill="white"></path>
           </svg>
         </span>
-      </div>
-      <div class="navigation-buttons">
-        <div class="nav-button nav-button-prev" tabindex="0" aria-label="Previous video" role="button">
-          <span class="nav-button-icon">
-            <svg width="22" height="13" viewBox="0 0 22 13" fill="none">
-              <path d="M0.999907 11.9999L10.9998 2L20.9999 12" stroke="white" stroke-width="2.2"></path>
-            </svg>
-          </span>
-        </div>
-        <div class="nav-button nav-button-next" tabindex="0" aria-label="Next video" role="button">
-          <span class="nav-button-icon">
-            <svg width="22" height="13" viewBox="0 0 22 13" fill="none">
-              <path d="M0.999907 1.00013L10.9998 11L20.9999 1" stroke="white" stroke-width="2.2"></path>
-            </svg>
-          </span>
-        </div>
       </div>
     `;
     document.body.appendChild(overlay);
