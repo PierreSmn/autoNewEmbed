@@ -48,18 +48,8 @@ async function initializeVideoCarousel(config) {
       overlay.innerHTML = ''; // Clear previous videos
       overlay.style.display = 'flex';
 
-      const currentVideo = createVideoElement(data, index);
-      overlay.appendChild(currentVideo);
-
-      if (index < data.length - 1) {
-        const nextVideo = createVideoElement(data, index + 1);
-        overlay.appendChild(nextVideo);
-      }
-
-      if (index > 0) {
-        const prevVideo = createVideoElement(data, index - 1);
-        overlay.appendChild(prevVideo);
-      }
+      const videoElement = createVideoElement(data, index);
+      overlay.appendChild(videoElement);
 
       overlay.scrollTop = 0;
       setupScrollHandler(data, index);
@@ -70,48 +60,25 @@ async function initializeVideoCarousel(config) {
       let currentIndex = startIndex;
 
       const handleScroll = () => {
-        const currentVideo = overlay.children[0];
-        const nextVideo = overlay.children[1];
-        const prevVideo = overlay.children[2];
         const scrollTop = overlay.scrollTop;
         const windowHeight = window.innerHeight;
 
-        if (scrollTop >= windowHeight && nextVideo) {
+        if (scrollTop >= windowHeight) {
           currentIndex++;
           if (currentIndex < data.length) {
             overlay.innerHTML = '';
-            const currentVideo = createVideoElement(data, currentIndex);
-            overlay.appendChild(currentVideo);
-
-            if (currentIndex < data.length - 1) {
-              const nextVideo = createVideoElement(data, currentIndex + 1);
-              overlay.appendChild(nextVideo);
-            }
-
-            if (currentIndex > 0) {
-              const prevVideo = createVideoElement(data, currentIndex - 1);
-              overlay.appendChild(prevVideo);
-            }
+            const videoElement = createVideoElement(data, currentIndex);
+            overlay.appendChild(videoElement);
             overlay.scrollTop = 0;
           } else {
             currentIndex = data.length - 1;
           }
-        } else if (scrollTop <= 0 && prevVideo) {
+        } else if (scrollTop <= -windowHeight) {
           currentIndex--;
           if (currentIndex >= 0) {
             overlay.innerHTML = '';
-            const currentVideo = createVideoElement(data, currentIndex);
-            overlay.appendChild(currentVideo);
-
-            if (currentIndex < data.length - 1) {
-              const nextVideo = createVideoElement(data, currentIndex + 1);
-              overlay.appendChild(nextVideo);
-            }
-
-            if (currentIndex > 0) {
-              const prevVideo = createVideoElement(data, currentIndex - 1);
-              overlay.appendChild(prevVideo);
-            }
+            const videoElement = createVideoElement(data, currentIndex);
+            overlay.appendChild(videoElement);
             overlay.scrollTop = windowHeight;
           } else {
             currentIndex = 0;
