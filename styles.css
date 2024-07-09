@@ -1,0 +1,180 @@
+body, html {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+#carousel-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  scroll-snap-type: x mandatory; /* Apply scroll snapping */
+  max-width: 800px; /* Increase width to accommodate 5 items */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  position: relative;
+  margin: 0 auto; /* Center the container */
+  padding-bottom: 20px; /* Add space for the navigation buttons */
+}
+
+#carousel-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for WebKit-based browsers */
+}
+
+.carousel-item {
+  flex: none;
+  height: 250px; /* Fixed height */
+  width: 141px; /* Fixed width */
+  scroll-snap-align: start;
+  margin-right: 10px;
+  position: relative;
+  cursor: pointer;
+}
+
+.carousel-item img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 4px;
+}
+
+.play-button-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 48px;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black or grey */
+  border-radius: 50%;
+}
+
+.play-button-overlay svg {
+  fill: #FFFFFF;
+}
+
+mux-player {
+  width: 100%;
+  height: auto;
+  --live-button: none;
+  --seek-backward-button: none;
+  --seek-forward-button: none;
+  --mute-button: none;
+  --captions-button: none;
+  --airplay-button: none;
+  --pip-button: none;
+  --fullscreen-button: none;
+  --cast-button: none;
+  --playback-rate-button: none;
+  --volume-range: none;
+  --rendition-selectmenu: none;
+}
+
+.fullscreen-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fullscreen-video {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+}
+
+.close-button {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.close-button-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.navigation-buttons {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-button {
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  margin-bottom: 8px; /* Space between the buttons */
+  border: 2px solid grey; /* Grey border */
+}
+
+.nav-button:last-child {
+  margin-bottom: 0;
+}
+
+.nav-button-icon svg {
+  fill: white;
+  width: 22px;
+  height: 13px;
+}
+
+.carousel-nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px; /* Increase size */
+  height: 32px; /* Increase size */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7); /* More visible background */
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  border: 2px solid white; /* White border for visibility */
+}
+
+.carousel-nav-button-left {
+  left: -40px; /* Adjust to position 40px to the left */
+}
+
+.carousel-nav-button-right {
+  right: -40px; /* Adjust to position 40px to the right */
+}
+
+.carousel-nav-button svg {
+  fill: white;
+  width: 32px; /* Increase icon size */
+  height: 32px; /* Increase icon size */
+}
+
+/* Media query for mobile devices */
+@media (max-width: 600px) {
+  #carousel-container {
+    justify-content: flex-start; /* Align to start on mobile */
+    padding-bottom: 10px; /* Adjust padding */
+  }
+}
