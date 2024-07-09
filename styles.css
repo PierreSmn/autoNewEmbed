@@ -78,11 +78,11 @@ body, html {
 
 .fullscreen-video-container {
   height: 100vh; /* Full viewport height */
-  width: 56.25vh; /* 9/16 aspect ratio */
+  width: 100%; /* Full viewport width */
   display: flex;
   justify-content: center;
   align-items: center;
-  scroll-snap-align: center; /* Snap earlier */
+  scroll-snap-align: start; /* Snap earlier */
 }
 
 .fullscreen-video {
