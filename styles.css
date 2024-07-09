@@ -10,7 +10,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-x: auto;
   scroll-snap-type: x mandatory;
   max-width: 800px;
   box-sizing: border-box;
