@@ -40,6 +40,7 @@ async function initializeVideoCarousel(config) {
           playback-id="${data[index].playback_id}"
           metadata-video-title="${data[index].title}"
           metadata-viewer-user-id="user"
+          autoplay
         ></mux-player>`;
       return container;
     }
@@ -59,10 +60,10 @@ async function initializeVideoCarousel(config) {
 
       if (index > 0) {
         const prevContainer = createVideoContainer(index - 1);
-        overlay.appendChild(prevContainer);
+        overlay.insertBefore(prevContainer, currentContainer);
       }
 
-      overlay.scrollTop = 0;
+      overlay.scrollTop = window.innerHeight; // Start at the current video
       setupScrollHandler(data, index);
     }
 
@@ -77,40 +78,36 @@ async function initializeVideoCarousel(config) {
         if (scrollTop >= windowHeight) {
           currentIndex++;
           if (currentIndex < data.length) {
-            overlay.innerHTML = '';
-            const currentContainer = createVideoContainer(currentIndex);
-            overlay.appendChild(currentContainer);
+            const nextContainer = createVideoContainer(currentIndex);
+            overlay.appendChild(nextContainer);
+            overlay.scrollTop = 0; // Reset scroll position
 
-            if (currentIndex < data.length - 1) {
-              const nextContainer = createVideoContainer(currentIndex + 1);
-              overlay.appendChild(nextContainer);
+            // Remove previous container if needed
+            if (overlay.children.length > 3) {
+              overlay.removeChild(overlay.children[0]);
             }
 
-            if (currentIndex > 0) {
-              const prevContainer = createVideoContainer(currentIndex - 1);
-              overlay.appendChild(prevContainer);
-            }
-            overlay.scrollTop = 0;
+            // Update the current container
+            const currentContainer = overlay.children[0];
+            currentContainer.scrollIntoView({ behavior: 'smooth' });
           } else {
             currentIndex = data.length - 1;
           }
         } else if (scrollTop <= 0) {
           currentIndex--;
           if (currentIndex >= 0) {
-            overlay.innerHTML = '';
-            const currentContainer = createVideoContainer(currentIndex);
-            overlay.appendChild(currentContainer);
+            const prevContainer = createVideoContainer(currentIndex);
+            overlay.insertBefore(prevContainer, overlay.children[0]);
+            overlay.scrollTop = windowHeight; // Reset scroll position
 
-            if (currentIndex < data.length - 1) {
-              const nextContainer = createVideoContainer(currentIndex + 1);
-              overlay.appendChild(nextContainer);
+            // Remove next container if needed
+            if (overlay.children.length > 3) {
+              overlay.removeChild(overlay.children[overlay.children.length - 1]);
             }
 
-            if (currentIndex > 0) {
-              const prevContainer = createVideoContainer(currentIndex - 1);
-              overlay.appendChild(prevContainer);
-            }
-            overlay.scrollTop = windowHeight;
+            // Update the current container
+            const currentContainer = overlay.children[0];
+            currentContainer.scrollIntoView({ behavior: 'smooth' });
           } else {
             currentIndex = 0;
           }
@@ -149,7 +146,16 @@ async function initializeVideoCarousel(config) {
   const overlay = document.getElementById('fullscreen-overlay');
   overlay.style.display = 'none';
 
-  const closeButton = document.querySelector('.close-button');
+  const closeButton = document.createElement('div');
+  closeButton.className = 'close-button';
+  closeButton.innerHTML = `
+    <span class="close-button-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M12.0002 10.586L4.70718 3.29297L3.29297 4.70718L10.586 12.0002L3.29297 19.2933L4.70718 20.7075L12.0002 13.4145L19.2933 20.7075L20.7075 19.2933L13.4145 12.0002L20.7075 4.70723L19.2933 3.29302L12.0002 10.586Z" fill="white"></path>
+      </svg>
+    </span>`;
+  overlay.appendChild(closeButton);
+
   closeButton.addEventListener('click', function () {
     overlay.style.display = 'none';
   });
