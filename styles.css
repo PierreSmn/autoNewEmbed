@@ -78,7 +78,7 @@ body, html {
 
 .fullscreen-video-container {
   height: 100vh; /* Full viewport height */
-  width: 56.25vh; /* 9/16 aspect ratio */
+  width: 100vw; /* Full viewport width */
   display: flex;
   justify-content: center;
   align-items: center;
