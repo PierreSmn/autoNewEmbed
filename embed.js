@@ -5,7 +5,7 @@
     playButtonColor: '#0000FF',
     integrationId: null, // Default value, should be set by the customer
     numVideos: 5, // Default value
-    disableClick: false // New variable to disable click
+    disableClick: false // Default value is false
   };
 
   const supabaseUrl = 'https://pifcxlqwffdrqcwggoqb.supabase.co/rest/v1/integrations';
