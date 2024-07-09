@@ -78,7 +78,7 @@ async function initializeVideoCarousel(config) {
             overlay.innerHTML = '';
             const videoElement = createVideoElement(data, currentIndex);
             overlay.appendChild(videoElement);
-            overlay.scrollTop = 0;
+            overlay.scrollTop = windowHeight;
           } else {
             currentIndex = 0;
           }
