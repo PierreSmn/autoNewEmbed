@@ -53,17 +53,15 @@ async function initializeVideoCarousel(config) {
 
       if (index < data.length - 1) {
         const nextContainer = createVideoContainer(index + 1);
-        nextContainer.style.display = 'none';
         overlay.appendChild(nextContainer);
       }
 
       if (index > 0) {
         const prevContainer = createVideoContainer(index - 1);
-        prevContainer.style.display = 'none';
-        overlay.appendChild(prevContainer);
+        overlay.insertBefore(prevContainer, currentContainer);
       }
 
-      overlay.scrollTop = 0;
+      overlay.scrollTop = window.innerHeight; // Start at the current video
       setupScrollHandler(data, index);
     }
 
@@ -78,39 +76,31 @@ async function initializeVideoCarousel(config) {
         if (scrollTop >= windowHeight) {
           currentIndex++;
           if (currentIndex < data.length) {
-            overlay.innerHTML = '';
             const currentContainer = createVideoContainer(currentIndex);
             overlay.appendChild(currentContainer);
 
-            if (currentIndex < data.length - 1) {
-              const nextContainer = createVideoContainer(currentIndex + 1);
-              overlay.appendChild(nextContainer);
+            // Remove the previous element, if it exists
+            if (overlay.children.length > 3) {
+              overlay.removeChild(overlay.children[0]);
             }
 
-            if (currentIndex > 0) {
-              const prevContainer = createVideoContainer(currentIndex - 1);
-              overlay.appendChild(prevContainer);
-            }
-            overlay.scrollTop = 0;
+            // Adjust the scroll position
+            overlay.scrollTop = windowHeight;
           } else {
             currentIndex = data.length - 1;
           }
         } else if (scrollTop <= 0) {
           currentIndex--;
           if (currentIndex >= 0) {
-            overlay.innerHTML = '';
             const currentContainer = createVideoContainer(currentIndex);
-            overlay.appendChild(currentContainer);
+            overlay.insertBefore(currentContainer, overlay.children[0]);
 
-            if (currentIndex < data.length - 1) {
-              const nextContainer = createVideoContainer(currentIndex + 1);
-              overlay.appendChild(nextContainer);
+            // Remove the next element, if it exists
+            if (overlay.children.length > 3) {
+              overlay.removeChild(overlay.children[overlay.children.length - 1]);
             }
 
-            if (currentIndex > 0) {
-              const prevContainer = createVideoContainer(currentIndex - 1);
-              overlay.appendChild(prevContainer);
-            }
+            // Adjust the scroll position
             overlay.scrollTop = windowHeight;
           } else {
             currentIndex = 0;
