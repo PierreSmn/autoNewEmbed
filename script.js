@@ -40,7 +40,7 @@ async function initializeVideoCarousel(config) {
           metadata-video-title="${data[index].title}"
           metadata-viewer-user-id="user"
         ></mux-player>`;
-      overlay.appendChild(videoContainer);
+      return videoContainer;
     }
 
     function openOverlay(startIndex) {
@@ -48,10 +48,13 @@ async function initializeVideoCarousel(config) {
       overlay.innerHTML = ''; // Clear previous videos
       overlay.style.display = 'flex';
 
-      // Preload the current and next video
-      preloadVideo(data, startIndex);
+      const currentVideo = preloadVideo(data, startIndex);
+      overlay.appendChild(currentVideo);
+
       if (startIndex < data.length - 1) {
-        preloadVideo(data, startIndex + 1);
+        const nextVideo = preloadVideo(data, startIndex + 1);
+        nextVideo.style.display = 'none';
+        overlay.appendChild(nextVideo);
       }
 
       setupScrollHandler(data, startIndex);
@@ -60,43 +63,55 @@ async function initializeVideoCarousel(config) {
     function setupScrollHandler(data, startIndex) {
       const overlay = document.getElementById('fullscreen-overlay');
       let currentIndex = startIndex;
-      let isThrottled = false;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const nextVideoIndex = Array.from(overlay.children).indexOf(entry.target) + 1;
+            if (nextVideoIndex < overlay.children.length) {
+              overlay.children[nextVideoIndex].style.display = 'flex';
+              overlay.children[nextVideoIndex].scrollIntoView({ behavior: 'smooth' });
+            }
+          }
+        });
+      }, {
+        root: overlay,
+        threshold: 0.5
+      });
+
+      Array.from(overlay.children).forEach(child => observer.observe(child));
 
       overlay.addEventListener('scroll', () => {
-        if (isThrottled) return;
-        isThrottled = true;
+        const scrollPosition = overlay.scrollTop;
+        const overlayHeight = overlay.offsetHeight;
 
-        setTimeout(() => {
-          const currentVideo = overlay.children[0];
-          const nextVideo = overlay.children[1];
-          const previousVideo = overlay.children[0];
-          
-          if (currentVideo && nextVideo) {
-            const rect = nextVideo.getBoundingClientRect();
-            if (rect.top <= window.innerHeight / 2) {
-              overlay.scrollTop = 0;
-              overlay.removeChild(currentVideo);
-              currentIndex++;
-              if (currentIndex < data.length) {
-                preloadVideo(data, currentIndex + 1);
-              }
+        if (scrollPosition >= overlayHeight) {
+          currentIndex++;
+          if (currentIndex < data.length) {
+            overlay.innerHTML = '';
+            const currentVideo = preloadVideo(data, currentIndex);
+            overlay.appendChild(currentVideo);
+
+            if (currentIndex < data.length - 1) {
+              const nextVideo = preloadVideo(data, currentIndex + 1);
+              nextVideo.style.display = 'none';
+              overlay.appendChild(nextVideo);
             }
           }
-          
-          if (currentVideo && previousVideo) {
-            const rect = previousVideo.getBoundingClientRect();
-            if (rect.bottom >= window.innerHeight / 2) {
-              overlay.scrollTop = overlay.offsetHeight;
-              overlay.removeChild(nextVideo);
-              currentIndex--;
-              if (currentIndex > 0) {
-                preloadVideo(data, currentIndex - 1);
-              }
-            }
-          }
+          overlay.scrollTop = 0;
+        } else if (scrollPosition <= 0 && currentIndex > 0) {
+          currentIndex--;
+          overlay.innerHTML = '';
+          const currentVideo = preloadVideo(data, currentIndex);
+          overlay.appendChild(currentVideo);
 
-          isThrottled = false;
-        }, 300);
+          if (currentIndex < data.length - 1) {
+            const nextVideo = preloadVideo(data, currentIndex + 1);
+            nextVideo.style.display = 'none';
+            overlay.appendChild(nextVideo);
+          }
+          overlay.scrollTop = overlayHeight;
+        }
       });
     }
 
