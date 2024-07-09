@@ -10,7 +10,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow-x: auto;
+  overflow-x: auto; /* Enable horizontal scrolling */
   scroll-snap-type: x mandatory;
   max-width: 800px;
   box-sizing: border-box;
@@ -82,8 +82,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  scroll-snap-align: start; /* Snap earlier */
-  background-color: grey; /* Placeholder background color */
+  scroll-snap-align: center; /* Snap earlier */
 }
 
 .fullscreen-video {
