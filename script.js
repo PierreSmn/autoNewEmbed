@@ -5,7 +5,7 @@ async function initializeVideoCarousel(config) {
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpZmN4bHF3ZmZkcnFjd2dnb3FiIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzMyNjY2NTYsImV4cCI6MTk4ODg0MjY1Nn0.lha9G8j7lPLVGv0IU1sAT4SzrJb0I87LfhhvQV8Tc2Q';
 
   let data = [];
-  
+
   try {
     const response = await fetch(supabaseUrl, {
       method: 'GET',
@@ -31,19 +31,17 @@ async function initializeVideoCarousel(config) {
     // Update carousel
     updateCarousel();
 
-    function preloadVideos(data, startIndex, numVideos) {
-      for (let i = startIndex; i < Math.min(startIndex + numVideos, data.length); i++) {
-        const videoContainer = document.createElement('div');
-        videoContainer.className = 'fullscreen-video-container';
-        videoContainer.innerHTML = `
-          <mux-player
-            class="fullscreen-video"
-            playback-id="${data[i].playback_id}"
-            metadata-video-title="${data[i].title}"
-            metadata-viewer-user-id="user"
-          ></mux-player>`;
-        overlay.appendChild(videoContainer);
-      }
+    function preloadVideo(data, index) {
+      const videoContainer = document.createElement('div');
+      videoContainer.className = 'fullscreen-video-container';
+      videoContainer.innerHTML = `
+        <mux-player
+          class="fullscreen-video"
+          playback-id="${data[index].playback_id}"
+          metadata-video-title="${data[index].title}"
+          metadata-viewer-user-id="user"
+        ></mux-player>`;
+      overlay.appendChild(videoContainer);
     }
 
     function openOverlay(startIndex) {
@@ -51,31 +49,49 @@ async function initializeVideoCarousel(config) {
       overlay.innerHTML = ''; // Clear previous videos
       overlay.style.display = 'flex';
 
-      // Preload initial videos and set up intersection observer
-      preloadVideos(data, startIndex, 3);
-      setupIntersectionObserver(data);
+      // Preload the current and next video
+      preloadVideo(data, startIndex);
+      if (startIndex < data.length - 1) {
+        preloadVideo(data, startIndex + 1);
+      }
+
+      setupScrollHandler(data, startIndex);
     }
 
-    function setupIntersectionObserver(data) {
-      const options = {
-        root: document.getElementById('fullscreen-overlay'),
-        rootMargin: '0px',
-        threshold: 1.0
-      };
+    function setupScrollHandler(data, startIndex) {
+      const overlay = document.getElementById('fullscreen-overlay');
+      let currentIndex = startIndex;
+      let isThrottled = false;
 
-      const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const currentIndex = Array.from(overlay.children).indexOf(entry.target);
+      overlay.addEventListener('scroll', () => {
+        if (isThrottled) return;
+        isThrottled = true;
+
+        setTimeout(() => {
+          const scrollPosition = overlay.scrollTop;
+          const overlayHeight = overlay.offsetHeight;
+          const threshold = overlayHeight / 2;
+
+          if (scrollPosition >= threshold && currentIndex < data.length - 1) {
+            currentIndex++;
+            overlay.innerHTML = '';
+            preloadVideo(data, currentIndex);
             if (currentIndex < data.length - 1) {
-              preloadVideos(data, currentIndex + 1, 1); // Preload next video
+              preloadVideo(data, currentIndex + 1);
             }
+            overlay.scrollTop = 0;
+          } else if (scrollPosition <= -threshold && currentIndex > 0) {
+            currentIndex--;
+            overlay.innerHTML = '';
+            preloadVideo(data, currentIndex);
+            if (currentIndex < data.length - 1) {
+              preloadVideo(data, currentIndex + 1);
+            }
+            overlay.scrollTop = overlayHeight;
           }
-        });
-      }, options);
 
-      document.querySelectorAll('.fullscreen-video-container').forEach(videoContainer => {
-        observer.observe(videoContainer);
+          isThrottled = false;
+        }, 300);
       });
     }
 
