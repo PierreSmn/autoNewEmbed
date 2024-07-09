@@ -60,21 +60,43 @@ async function initializeVideoCarousel(config) {
     function setupScrollHandler(data, startIndex) {
       const overlay = document.getElementById('fullscreen-overlay');
       let currentIndex = startIndex;
+      let isThrottled = false;
 
       overlay.addEventListener('scroll', () => {
-        const currentVideo = overlay.children[0];
-        const nextVideo = overlay.children[1];
-        if (currentVideo && nextVideo) {
-          const rect = nextVideo.getBoundingClientRect();
-          if (rect.top <= window.innerHeight / 2) {
-            overlay.scrollTop = 0;
-            overlay.removeChild(currentVideo);
-            currentIndex++;
-            if (currentIndex < data.length) {
-              preloadVideo(data, currentIndex + 1);
+        if (isThrottled) return;
+        isThrottled = true;
+
+        setTimeout(() => {
+          const currentVideo = overlay.children[0];
+          const nextVideo = overlay.children[1];
+          const previousVideo = overlay.children[0];
+          
+          if (currentVideo && nextVideo) {
+            const rect = nextVideo.getBoundingClientRect();
+            if (rect.top <= window.innerHeight / 2) {
+              overlay.scrollTop = 0;
+              overlay.removeChild(currentVideo);
+              currentIndex++;
+              if (currentIndex < data.length) {
+                preloadVideo(data, currentIndex + 1);
+              }
             }
           }
-        }
+          
+          if (currentVideo && previousVideo) {
+            const rect = previousVideo.getBoundingClientRect();
+            if (rect.bottom >= window.innerHeight / 2) {
+              overlay.scrollTop = overlay.offsetHeight;
+              overlay.removeChild(nextVideo);
+              currentIndex--;
+              if (currentIndex > 0) {
+                preloadVideo(data, currentIndex - 1);
+              }
+            }
+          }
+
+          isThrottled = false;
+        }, 300);
       });
     }
 
