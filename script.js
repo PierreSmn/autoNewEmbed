@@ -50,6 +50,42 @@ async function initializeVideoCarousel(config) {
 
       const videoElement = createVideoElement(data, index);
       overlay.appendChild(videoElement);
+
+      setupScrollHandler(data, index);
+    }
+
+    function setupScrollHandler(data, startIndex) {
+      const overlay = document.getElementById('fullscreen-overlay');
+      let currentIndex = startIndex;
+
+      const handleScroll = () => {
+        const scrollTop = overlay.scrollTop;
+        const windowHeight = window.innerHeight;
+
+        if (scrollTop >= windowHeight) {
+          currentIndex++;
+          if (currentIndex < data.length) {
+            overlay.innerHTML = '';
+            const videoElement = createVideoElement(data, currentIndex);
+            overlay.appendChild(videoElement);
+            overlay.scrollTop = 0;
+          } else {
+            currentIndex = data.length - 1;
+          }
+        } else if (scrollTop <= -windowHeight) {
+          currentIndex--;
+          if (currentIndex >= 0) {
+            overlay.innerHTML = '';
+            const videoElement = createVideoElement(data, currentIndex);
+            overlay.appendChild(videoElement);
+            overlay.scrollTop = 0;
+          } else {
+            currentIndex = 0;
+          }
+        }
+      };
+
+      overlay.addEventListener('scroll', handleScroll);
     }
 
     function updateCarousel() {
