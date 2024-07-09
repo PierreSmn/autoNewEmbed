@@ -2,6 +2,7 @@ body, html {
   padding: 0;
   margin: 0;
   height: 100%;
+  overflow: hidden;
   font-family: Arial, sans-serif;
 }
 
@@ -9,23 +10,23 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow-x: auto; /* Enable horizontal scrolling */
-  scroll-snap-type: x mandatory; /* Apply scroll snapping */
-  max-width: 800px; /* Increase width to accommodate 5 items */
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  max-width: 800px;
+  box-sizing: border-box;
   position: relative;
-  margin: 0 auto; /* Center the container */
-  padding-bottom: 20px; /* Add space for the navigation buttons */
+  margin: 0 auto;
+  padding-bottom: 20px;
 }
 
 #carousel-container::-webkit-scrollbar {
-  display: none; /* Hide scrollbar for WebKit-based browsers */
+  display: none;
 }
 
 .carousel-item {
   flex: none;
-  height: 250px; /* Fixed height */
-  width: 141px; /* Fixed width */
+  height: 250px;
+  width: 141px;
   scroll-snap-align: start;
   margin-right: 10px;
   position: relative;
@@ -50,7 +51,7 @@ body, html {
   align-items: center;
   width: 48px;
   height: 48px;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black or grey */
+  background-color: rgba(0, 0, 0, 0.5);
   border-radius: 50%;
 }
 
@@ -84,14 +85,11 @@ mux-player {
   height: 100%;
   background-color: black;
   z-index: 1000;
-  overflow-y: scroll; /* Enable vertical scrolling */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  overflow: hidden;
 }
 
 .fullscreen-video-container {
-  height: 100vh; /* Full viewport height */
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -120,7 +118,7 @@ mux-player {
 /* Media query for mobile devices */
 @media (max-width: 600px) {
   #carousel-container {
-    justify-content: flex-start; /* Align to start on mobile */
-    padding-bottom: 10px; /* Adjust padding */
+    justify-content: flex-start;
+    padding-bottom: 10px;
   }
 }
