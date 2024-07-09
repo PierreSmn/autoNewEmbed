@@ -40,9 +40,19 @@ async function initializeVideoCarousel(config) {
           playback-id="${data[index].playback_id}"
           metadata-video-title="${data[index].title}"
           metadata-viewer-user-id="user"
-          autoplay
         ></mux-player>`;
       return container;
+    }
+
+    function playCurrentVideo() {
+      const videos = document.querySelectorAll('.fullscreen-video');
+      videos.forEach((video, index) => {
+        if (index === currentIndex) {
+          video.play();
+        } else {
+          video.pause();
+        }
+      });
     }
 
     function openOverlay(index) {
@@ -64,12 +74,13 @@ async function initializeVideoCarousel(config) {
       }
 
       overlay.scrollTop = window.innerHeight; // Start at the current video
+      playCurrentVideo();
       setupScrollHandler(data, index);
     }
 
     function setupScrollHandler(data, startIndex) {
       const overlay = document.getElementById('fullscreen-overlay');
-      let currentIndex = startIndex;
+      currentIndex = startIndex;
 
       const handleScroll = () => {
         const scrollTop = overlay.scrollTop;
@@ -78,36 +89,16 @@ async function initializeVideoCarousel(config) {
         if (scrollTop >= windowHeight) {
           currentIndex++;
           if (currentIndex < data.length) {
-            const nextContainer = createVideoContainer(currentIndex);
-            overlay.appendChild(nextContainer);
             overlay.scrollTop = 0; // Reset scroll position
-
-            // Remove previous container if needed
-            if (overlay.children.length > 3) {
-              overlay.removeChild(overlay.children[0]);
-            }
-
-            // Update the current container
-            const currentContainer = overlay.children[0];
-            currentContainer.scrollIntoView({ behavior: 'smooth' });
+            playCurrentVideo();
           } else {
             currentIndex = data.length - 1;
           }
         } else if (scrollTop <= 0) {
           currentIndex--;
           if (currentIndex >= 0) {
-            const prevContainer = createVideoContainer(currentIndex);
-            overlay.insertBefore(prevContainer, overlay.children[0]);
             overlay.scrollTop = windowHeight; // Reset scroll position
-
-            // Remove next container if needed
-            if (overlay.children.length > 3) {
-              overlay.removeChild(overlay.children[overlay.children.length - 1]);
-            }
-
-            // Update the current container
-            const currentContainer = overlay.children[0];
-            currentContainer.scrollIntoView({ behavior: 'smooth' });
+            playCurrentVideo();
           } else {
             currentIndex = 0;
           }
