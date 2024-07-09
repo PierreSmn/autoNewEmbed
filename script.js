@@ -30,7 +30,7 @@ async function initializeVideoCarousel(config) {
 
     updateCarousel();
 
-    function preloadVideo(data, index) {
+    function createVideoElement(data, index) {
       const videoContainer = document.createElement('div');
       videoContainer.className = 'fullscreen-video-container';
       videoContainer.innerHTML = `
@@ -43,71 +43,13 @@ async function initializeVideoCarousel(config) {
       return videoContainer;
     }
 
-    function openOverlay(startIndex) {
+    function openOverlay(index) {
       const overlay = document.getElementById('fullscreen-overlay');
       overlay.innerHTML = ''; // Clear previous videos
       overlay.style.display = 'flex';
 
-      // Preload the current and next video
-      const currentVideo = preloadVideo(data, startIndex);
-      overlay.appendChild(currentVideo);
-
-      if (startIndex < data.length - 1) {
-        const nextVideo = preloadVideo(data, startIndex + 1);
-        nextVideo.style.display = 'none';
-        overlay.appendChild(nextVideo);
-      }
-
-      setupScrollHandler(data, startIndex);
-    }
-
-    function setupScrollHandler(data, startIndex) {
-      const overlay = document.getElementById('fullscreen-overlay');
-      let currentIndex = startIndex;
-
-      const observerOptions = {
-        root: overlay,
-        threshold: 0.5
-      };
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const currentVideoIndex = Array.from(overlay.children).indexOf(entry.target);
-            if (currentVideoIndex === 1 && currentIndex < data.length - 1) {
-              // Move to next video
-              currentIndex++;
-              overlay.innerHTML = '';
-              const newVideo = preloadVideo(data, currentIndex);
-              overlay.appendChild(newVideo);
-
-              if (currentIndex < data.length - 1) {
-                const nextVideo = preloadVideo(data, currentIndex + 1);
-                nextVideo.style.display = 'none';
-                overlay.appendChild(nextVideo);
-              }
-              observer.disconnect();
-              setupScrollHandler(data, currentIndex);
-            } else if (currentVideoIndex === 0 && currentIndex > 0) {
-              // Move to previous video
-              currentIndex--;
-              overlay.innerHTML = '';
-              const newVideo = preloadVideo(data, currentIndex);
-              overlay.appendChild(newVideo);
-
-              if (currentIndex < data.length - 1) {
-                const nextVideo = preloadVideo(data, currentIndex + 1);
-                nextVideo.style.display = 'none';
-                overlay.appendChild(nextVideo);
-              }
-              observer.disconnect();
-              setupScrollHandler(data, currentIndex);
-            }
-          }
-        });
-      }, observerOptions);
-
-      Array.from(overlay.children).forEach(child => observer.observe(child));
+      const videoElement = createVideoElement(data, index);
+      overlay.appendChild(videoElement);
     }
 
     function updateCarousel() {
