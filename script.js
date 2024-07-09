@@ -53,11 +53,13 @@ async function initializeVideoCarousel(config) {
 
       if (index < data.length - 1) {
         const nextContainer = createVideoContainer(index + 1);
+        nextContainer.style.display = 'none';
         overlay.appendChild(nextContainer);
       }
 
       if (index > 0) {
         const prevContainer = createVideoContainer(index - 1);
+        prevContainer.style.display = 'none';
         overlay.appendChild(prevContainer);
       }
 
