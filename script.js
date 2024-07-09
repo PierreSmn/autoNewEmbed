@@ -5,6 +5,7 @@ async function initializeVideoCarousel(config) {
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpZmN4bHF3ZmZkcnFjd2dnb3FiIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzMyNjY2NTYsImV4cCI6MTk4ODg0MjY1Nn0.lha9G8j7lPLVGv0IU1sAT4SzrJb0I87LfhhvQV8Tc2Q';
 
   let data = [];
+  let currentIndex = 0;
 
   try {
     const response = await fetch(supabaseUrl, {
@@ -30,17 +31,17 @@ async function initializeVideoCarousel(config) {
 
     updateCarousel();
 
-    function createVideoContainer(index) {
-      const container = document.createElement('div');
-      container.className = 'fullscreen-video-container';
-      container.innerHTML = `
+    function createVideoElement(data, index) {
+      const videoContainer = document.createElement('div');
+      videoContainer.className = 'fullscreen-video-container';
+      videoContainer.innerHTML = `
         <mux-player
           class="fullscreen-video"
           playback-id="${data[index].playback_id}"
           metadata-video-title="${data[index].title}"
           metadata-viewer-user-id="user"
         ></mux-player>`;
-      return container;
+      return videoContainer;
     }
 
     function openOverlay(index) {
@@ -48,20 +49,9 @@ async function initializeVideoCarousel(config) {
       overlay.innerHTML = ''; // Clear previous videos
       overlay.style.display = 'flex';
 
-      const currentContainer = createVideoContainer(index);
-      overlay.appendChild(currentContainer);
+      const currentVideo = createVideoElement(data, index);
+      overlay.appendChild(currentVideo);
 
-      if (index < data.length - 1) {
-        const nextContainer = createVideoContainer(index + 1);
-        overlay.appendChild(nextContainer);
-      }
-
-      if (index > 0) {
-        const prevContainer = createVideoContainer(index - 1);
-        overlay.insertBefore(prevContainer, currentContainer);
-      }
-
-      overlay.scrollTop = window.innerHeight; // Start at the current video
       setupScrollHandler(data, index);
     }
 
@@ -76,31 +66,43 @@ async function initializeVideoCarousel(config) {
         if (scrollTop >= windowHeight) {
           currentIndex++;
           if (currentIndex < data.length) {
-            const currentContainer = createVideoContainer(currentIndex);
-            overlay.appendChild(currentContainer);
+            overlay.innerHTML = '';
+            const currentVideo = createVideoElement(data, currentIndex);
+            overlay.appendChild(currentVideo);
 
-            // Remove the previous element, if it exists
-            if (overlay.children.length > 3) {
-              overlay.removeChild(overlay.children[0]);
+            if (currentIndex < data.length - 1) {
+              const nextVideo = createVideoElement(data, currentIndex + 1);
+              nextVideo.style.display = 'none';
+              overlay.appendChild(nextVideo);
             }
 
-            // Adjust the scroll position
-            overlay.scrollTop = windowHeight;
+            if (currentIndex > 0) {
+              const prevVideo = createVideoElement(data, currentIndex - 1);
+              prevVideo.style.display = 'none';
+              overlay.appendChild(prevVideo);
+            }
+            overlay.scrollTop = 0;
           } else {
             currentIndex = data.length - 1;
           }
         } else if (scrollTop <= 0) {
           currentIndex--;
           if (currentIndex >= 0) {
-            const currentContainer = createVideoContainer(currentIndex);
-            overlay.insertBefore(currentContainer, overlay.children[0]);
+            overlay.innerHTML = '';
+            const currentVideo = createVideoElement(data, currentIndex);
+            overlay.appendChild(currentVideo);
 
-            // Remove the next element, if it exists
-            if (overlay.children.length > 3) {
-              overlay.removeChild(overlay.children[overlay.children.length - 1]);
+            if (currentIndex < data.length - 1) {
+              const nextVideo = createVideoElement(data, currentIndex + 1);
+              nextVideo.style.display = 'none';
+              overlay.appendChild(nextVideo);
             }
 
-            // Adjust the scroll position
+            if (currentIndex > 0) {
+              const prevVideo = createVideoElement(data, currentIndex - 1);
+              prevVideo.style.display = 'none';
+              overlay.appendChild(prevVideo);
+            }
             overlay.scrollTop = windowHeight;
           } else {
             currentIndex = 0;
