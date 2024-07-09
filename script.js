@@ -28,7 +28,6 @@ async function initializeVideoCarousel(config) {
     const carouselContainer = document.getElementById('carousel-container');
     carouselContainer.innerHTML = '';
 
-    // Update carousel
     updateCarousel();
 
     function preloadVideo(data, index) {
