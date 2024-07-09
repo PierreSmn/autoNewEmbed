@@ -60,37 +60,29 @@ async function initializeVideoCarousel(config) {
     function setupScrollHandler(data, startIndex) {
       const overlay = document.getElementById('fullscreen-overlay');
       let currentIndex = startIndex;
-      let isThrottled = false;
 
       overlay.addEventListener('scroll', () => {
-        if (isThrottled) return;
-        isThrottled = true;
+        const scrollPosition = overlay.scrollTop;
+        const overlayHeight = overlay.offsetHeight;
+        const threshold = overlayHeight / 2;
 
-        setTimeout(() => {
-          const scrollPosition = overlay.scrollTop;
-          const overlayHeight = overlay.offsetHeight;
-          const threshold = overlayHeight / 2;
-
-          if (scrollPosition >= threshold && currentIndex < data.length - 1) {
-            currentIndex++;
-            overlay.innerHTML = '';
-            preloadVideo(data, currentIndex);
-            if (currentIndex < data.length - 1) {
-              preloadVideo(data, currentIndex + 1);
-            }
-            overlay.scrollTop = 0;
-          } else if (scrollPosition <= -threshold && currentIndex > 0) {
-            currentIndex--;
-            overlay.innerHTML = '';
-            preloadVideo(data, currentIndex);
-            if (currentIndex < data.length - 1) {
-              preloadVideo(data, currentIndex + 1);
-            }
-            overlay.scrollTop = overlayHeight;
+        if (scrollPosition >= threshold && currentIndex < data.length - 1) {
+          currentIndex++;
+          overlay.innerHTML = '';
+          preloadVideo(data, currentIndex);
+          if (currentIndex < data.length - 1) {
+            preloadVideo(data, currentIndex + 1);
           }
-
-          isThrottled = false;
-        }, 300);
+          overlay.scrollTop = 0;
+        } else if (scrollPosition <= -threshold && currentIndex > 0) {
+          currentIndex--;
+          overlay.innerHTML = '';
+          preloadVideo(data, currentIndex);
+          if (currentIndex < data.length - 1) {
+            preloadVideo(data, currentIndex + 1);
+          }
+          overlay.scrollTop = overlayHeight;
+        }
       });
     }
 
