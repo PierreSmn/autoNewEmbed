@@ -5,9 +5,7 @@ async function initializeVideoCarousel(config) {
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpZmN4bHF3ZmZkcnFjd2dnb3FiIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzMyNjY2NTYsImV4cCI6MTk4ODg0MjY1Nn0.lha9G8j7lPLVGv0IU1sAT4SzrJb0I87LfhhvQV8Tc2Q';
 
   let data = [];
-  let currentIndex = 0;
-  let startIndex = 0;
-
+  
   try {
     const response = await fetch(supabaseUrl, {
       method: 'GET',
@@ -30,66 +28,75 @@ async function initializeVideoCarousel(config) {
     const carouselContainer = document.getElementById('carousel-container');
     carouselContainer.innerHTML = '';
 
+    // Update carousel
     updateCarousel();
+
+    function preloadVideos(data, startIndex, numVideos) {
+      for (let i = startIndex; i < Math.min(startIndex + numVideos, data.length); i++) {
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'fullscreen-video-container';
+        videoContainer.innerHTML = `
+          <mux-player
+            class="fullscreen-video"
+            playback-id="${data[i].playback_id}"
+            metadata-video-title="${data[i].title}"
+            metadata-viewer-user-id="user"
+          ></mux-player>`;
+        overlay.appendChild(videoContainer);
+      }
+    }
+
+    function openOverlay(startIndex) {
+      const overlay = document.getElementById('fullscreen-overlay');
+      overlay.innerHTML = ''; // Clear previous videos
+      overlay.style.display = 'flex';
+
+      // Preload initial videos and set up intersection observer
+      preloadVideos(data, startIndex, 3);
+      setupIntersectionObserver(data);
+    }
+
+    function setupIntersectionObserver(data) {
+      const options = {
+        root: document.getElementById('fullscreen-overlay'),
+        rootMargin: '0px',
+        threshold: 1.0
+      };
+
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const currentIndex = Array.from(overlay.children).indexOf(entry.target);
+            if (currentIndex < data.length - 1) {
+              preloadVideos(data, currentIndex + 1, 1); // Preload next video
+            }
+          }
+        });
+      }, options);
+
+      document.querySelectorAll('.fullscreen-video-container').forEach(videoContainer => {
+        observer.observe(videoContainer);
+      });
+    }
 
     function updateCarousel() {
       carouselContainer.innerHTML = '';
-      for (let i = startIndex; i < Math.min(startIndex + 5, data.length); i++) {
+      for (let i = 0; i < data.length; i++) {
         const item = data[i];
         const carouselItem = document.createElement('div');
         carouselItem.className = 'carousel-item';
         carouselItem.innerHTML = `
           <img src="${item.thumbnail}" alt="Thumbnail">
-          ${!config.disableClick ? `
           <div class="play-button-overlay" style="background-color: rgba(0, 0, 0, 0.5)">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="${config.playButtonColor}" xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" clip-rule="evenodd" d="M8 5v14l11-7-11-7z"/>
             </svg>
-          </div>` : ''}`;
+          </div>`;
         carouselContainer.appendChild(carouselItem);
 
-        if (!config.disableClick) {
-          carouselItem.addEventListener('click', function () {
-            currentIndex = i;
-            openOverlay(item);
-          });
-        }
-      }
-
-      if (startIndex > 0) {
-        const leftButton = document.createElement('div');
-        leftButton.className = 'carousel-nav-button carousel-nav-button-left';
-        leftButton.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2"/>
-          </svg>`;
-        leftButton.addEventListener('click', navigateLeft);
-        carouselContainer.appendChild(leftButton);
-      }
-
-      if (startIndex + 5 < data.length) {
-        const rightButton = document.createElement('div');
-        rightButton.className = 'carousel-nav-button carousel-nav-button-right';
-        rightButton.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 18l6-6-6-6" stroke="white" stroke-width="2"/>
-          </svg>`;
-        rightButton.addEventListener('click', navigateRight);
-        carouselContainer.appendChild(rightButton);
-      }
-    }
-
-    function navigateLeft() {
-      if (startIndex > 0) {
-        startIndex--;
-        updateCarousel();
-      }
-    }
-
-    function navigateRight() {
-      if (startIndex + 5 < data.length) {
-        startIndex++;
-        updateCarousel();
+        carouselItem.addEventListener('click', function () {
+          openOverlay(i);
+        });
       }
     }
 
@@ -98,49 +105,11 @@ async function initializeVideoCarousel(config) {
     document.getElementById('carousel-container').innerHTML = 'Failed to load data.';
   }
 
-  function openOverlay(item) {
-    const overlay = document.getElementById('fullscreen-overlay');
-    const muxPlayer = overlay.querySelector('mux-player');
-
-    muxPlayer.setAttribute('playback-id', item.playback_id);
-    muxPlayer.setAttribute('metadata-video-title', item.title);
-    muxPlayer.setAttribute('metadata-viewer-user-id', 'user');
-
-    overlay.style.display = 'flex';
-
-    muxPlayer.addEventListener('loadedmetadata', function () {
-      muxPlayer.play();
-    });
-
-    // Add event listener for video end to play next video
-    muxPlayer.addEventListener('ended', playNextVideo);
-  }
-
-  function playNextVideo() {
-    currentIndex = (currentIndex + 1) % data.length;
-    openOverlay(data[currentIndex]);
-  }
-
-  function playPreviousVideo() {
-    currentIndex = (currentIndex - 1 + data.length) % data.length;
-    openOverlay(data[currentIndex]);
-  }
+  const overlay = document.getElementById('fullscreen-overlay');
+  overlay.style.display = 'none';
 
   const closeButton = document.querySelector('.close-button');
   closeButton.addEventListener('click', function () {
-    const overlay = document.getElementById('fullscreen-overlay');
     overlay.style.display = 'none';
-
-    const muxPlayer = overlay.querySelector('mux-player');
-    muxPlayer.pause();
   });
-
-  const nextButton = document.querySelector('.nav-button-next');
-  nextButton.addEventListener('click', playNextVideo);
-
-  const prevButton = document.querySelector('.nav-button-prev');
-  prevButton.addEventListener('click', playPreviousVideo);
-
-  const overlay = document.getElementById('fullscreen-overlay');
-  overlay.style.display = 'none';
 }
