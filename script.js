@@ -62,26 +62,18 @@ async function initializeVideoCarousel(config) {
       let currentIndex = startIndex;
 
       overlay.addEventListener('scroll', () => {
-        const scrollPosition = overlay.scrollTop;
-        const overlayHeight = overlay.offsetHeight;
-        const threshold = overlayHeight / 2;
-
-        if (scrollPosition >= threshold && currentIndex < data.length - 1) {
-          currentIndex++;
-          overlay.innerHTML = '';
-          preloadVideo(data, currentIndex);
-          if (currentIndex < data.length - 1) {
-            preloadVideo(data, currentIndex + 1);
+        const currentVideo = overlay.children[0];
+        const nextVideo = overlay.children[1];
+        if (currentVideo && nextVideo) {
+          const rect = nextVideo.getBoundingClientRect();
+          if (rect.top <= window.innerHeight / 2) {
+            overlay.scrollTop = 0;
+            overlay.removeChild(currentVideo);
+            currentIndex++;
+            if (currentIndex < data.length) {
+              preloadVideo(data, currentIndex + 1);
+            }
           }
-          overlay.scrollTop = 0;
-        } else if (scrollPosition <= -threshold && currentIndex > 0) {
-          currentIndex--;
-          overlay.innerHTML = '';
-          preloadVideo(data, currentIndex);
-          if (currentIndex < data.length - 1) {
-            preloadVideo(data, currentIndex + 1);
-          }
-          overlay.scrollTop = overlayHeight;
         }
       });
     }
