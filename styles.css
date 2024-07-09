@@ -2,6 +2,7 @@ body, html {
   padding: 0;
   margin: 0;
   height: 100%;
+  font-family: Arial, sans-serif;
 }
 
 #carousel-container {
@@ -83,9 +84,18 @@ mux-player {
   height: 100%;
   background-color: black;
   z-index: 1000;
+  overflow-y: scroll; /* Enable vertical scrolling */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fullscreen-video-container {
+  height: 100vh; /* Full viewport height */
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .fullscreen-video {
