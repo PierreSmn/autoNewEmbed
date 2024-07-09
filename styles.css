@@ -98,8 +98,8 @@ mux-player {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  scroll-snap-align: start; /* Snap scrolling */
+  width: 56.25vh; /* 9/16 aspect ratio */
+  scroll-snap-align: center; /* Snap earlier */
 }
 
 .fullscreen-video {
