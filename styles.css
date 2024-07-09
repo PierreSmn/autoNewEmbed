@@ -10,7 +10,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-x: auto;
   scroll-snap-type: x mandatory;
   max-width: 800px;
   box-sizing: border-box;
@@ -89,6 +89,7 @@ mux-player {
   display: flex;
   flex-direction: column;
   align-items: center;
+  scroll-snap-type: y mandatory; /* Snap scrolling */
 }
 
 .fullscreen-video-container {
@@ -97,6 +98,7 @@ mux-player {
   justify-content: center;
   align-items: center;
   width: 100%;
+  scroll-snap-align: start; /* Snap scrolling */
 }
 
 .fullscreen-video {
