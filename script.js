@@ -48,8 +48,20 @@ async function initializeVideoCarousel(config) {
       overlay.innerHTML = ''; // Clear previous videos
       overlay.style.display = 'flex';
 
-      const videoElement = createVideoElement(data, index);
-      overlay.appendChild(videoElement);
+      const currentVideo = createVideoElement(data, index);
+      overlay.appendChild(currentVideo);
+
+      if (index < data.length - 1) {
+        const nextVideo = createVideoElement(data, index + 1);
+        nextVideo.style.display = 'none';
+        overlay.appendChild(nextVideo);
+      }
+
+      if (index > 0) {
+        const prevVideo = createVideoElement(data, index - 1);
+        prevVideo.style.display = 'none';
+        overlay.appendChild(prevVideo);
+      }
 
       setupScrollHandler(data, index);
     }
@@ -59,25 +71,52 @@ async function initializeVideoCarousel(config) {
       let currentIndex = startIndex;
 
       const handleScroll = () => {
+        const currentVideo = overlay.children[0];
+        const nextVideo = overlay.children[1];
+        const prevVideo = overlay.children[2];
         const scrollTop = overlay.scrollTop;
         const windowHeight = window.innerHeight;
 
-        if (scrollTop >= windowHeight) {
+        if (scrollTop >= windowHeight && nextVideo) {
           currentIndex++;
           if (currentIndex < data.length) {
             overlay.innerHTML = '';
-            const videoElement = createVideoElement(data, currentIndex);
-            overlay.appendChild(videoElement);
+            const currentVideo = createVideoElement(data, currentIndex);
+            overlay.appendChild(currentVideo);
+
+            if (currentIndex < data.length - 1) {
+              const nextVideo = createVideoElement(data, currentIndex + 1);
+              nextVideo.style.display = 'none';
+              overlay.appendChild(nextVideo);
+            }
+
+            if (currentIndex > 0) {
+              const prevVideo = createVideoElement(data, currentIndex - 1);
+              prevVideo.style.display = 'none';
+              overlay.appendChild(prevVideo);
+            }
             overlay.scrollTop = 0;
           } else {
             currentIndex = data.length - 1;
           }
-        } else if (scrollTop <= -windowHeight) {
+        } else if (scrollTop <= 0 && prevVideo) {
           currentIndex--;
           if (currentIndex >= 0) {
             overlay.innerHTML = '';
-            const videoElement = createVideoElement(data, currentIndex);
-            overlay.appendChild(videoElement);
+            const currentVideo = createVideoElement(data, currentIndex);
+            overlay.appendChild(currentVideo);
+
+            if (currentIndex < data.length - 1) {
+              const nextVideo = createVideoElement(data, currentIndex + 1);
+              nextVideo.style.display = 'none';
+              overlay.appendChild(nextVideo);
+            }
+
+            if (currentIndex > 0) {
+              const prevVideo = createVideoElement(data, currentIndex - 1);
+              prevVideo.style.display = 'none';
+              overlay.appendChild(prevVideo);
+            }
             overlay.scrollTop = windowHeight;
           } else {
             currentIndex = 0;
