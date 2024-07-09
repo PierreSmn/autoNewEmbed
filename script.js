@@ -53,16 +53,15 @@ async function initializeVideoCarousel(config) {
 
       if (index < data.length - 1) {
         const nextVideo = createVideoElement(data, index + 1);
-        nextVideo.style.display = 'none';
         overlay.appendChild(nextVideo);
       }
 
       if (index > 0) {
         const prevVideo = createVideoElement(data, index - 1);
-        prevVideo.style.display = 'none';
         overlay.appendChild(prevVideo);
       }
 
+      overlay.scrollTop = 0;
       setupScrollHandler(data, index);
     }
 
@@ -86,13 +85,11 @@ async function initializeVideoCarousel(config) {
 
             if (currentIndex < data.length - 1) {
               const nextVideo = createVideoElement(data, currentIndex + 1);
-              nextVideo.style.display = 'none';
               overlay.appendChild(nextVideo);
             }
 
             if (currentIndex > 0) {
               const prevVideo = createVideoElement(data, currentIndex - 1);
-              prevVideo.style.display = 'none';
               overlay.appendChild(prevVideo);
             }
             overlay.scrollTop = 0;
@@ -108,13 +105,11 @@ async function initializeVideoCarousel(config) {
 
             if (currentIndex < data.length - 1) {
               const nextVideo = createVideoElement(data, currentIndex + 1);
-              nextVideo.style.display = 'none';
               overlay.appendChild(nextVideo);
             }
 
             if (currentIndex > 0) {
               const prevVideo = createVideoElement(data, currentIndex - 1);
-              prevVideo.style.display = 'none';
               overlay.appendChild(prevVideo);
             }
             overlay.scrollTop = windowHeight;
