@@ -48,6 +48,7 @@ async function initializeVideoCarousel(config) {
       overlay.innerHTML = ''; // Clear previous videos
       overlay.style.display = 'flex';
 
+      // Preload the current and next video
       const currentVideo = preloadVideo(data, startIndex);
       overlay.appendChild(currentVideo);
 
@@ -64,55 +65,49 @@ async function initializeVideoCarousel(config) {
       const overlay = document.getElementById('fullscreen-overlay');
       let currentIndex = startIndex;
 
+      const observerOptions = {
+        root: overlay,
+        threshold: 0.5
+      };
+
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            const nextVideoIndex = Array.from(overlay.children).indexOf(entry.target) + 1;
-            if (nextVideoIndex < overlay.children.length) {
-              overlay.children[nextVideoIndex].style.display = 'flex';
-              overlay.children[nextVideoIndex].scrollIntoView({ behavior: 'smooth' });
+            const currentVideoIndex = Array.from(overlay.children).indexOf(entry.target);
+            if (currentVideoIndex === 1 && currentIndex < data.length - 1) {
+              // Move to next video
+              currentIndex++;
+              overlay.innerHTML = '';
+              const newVideo = preloadVideo(data, currentIndex);
+              overlay.appendChild(newVideo);
+
+              if (currentIndex < data.length - 1) {
+                const nextVideo = preloadVideo(data, currentIndex + 1);
+                nextVideo.style.display = 'none';
+                overlay.appendChild(nextVideo);
+              }
+              observer.disconnect();
+              setupScrollHandler(data, currentIndex);
+            } else if (currentVideoIndex === 0 && currentIndex > 0) {
+              // Move to previous video
+              currentIndex--;
+              overlay.innerHTML = '';
+              const newVideo = preloadVideo(data, currentIndex);
+              overlay.appendChild(newVideo);
+
+              if (currentIndex < data.length - 1) {
+                const nextVideo = preloadVideo(data, currentIndex + 1);
+                nextVideo.style.display = 'none';
+                overlay.appendChild(nextVideo);
+              }
+              observer.disconnect();
+              setupScrollHandler(data, currentIndex);
             }
           }
         });
-      }, {
-        root: overlay,
-        threshold: 0.5
-      });
+      }, observerOptions);
 
       Array.from(overlay.children).forEach(child => observer.observe(child));
-
-      overlay.addEventListener('scroll', () => {
-        const scrollPosition = overlay.scrollTop;
-        const overlayHeight = overlay.offsetHeight;
-
-        if (scrollPosition >= overlayHeight) {
-          currentIndex++;
-          if (currentIndex < data.length) {
-            overlay.innerHTML = '';
-            const currentVideo = preloadVideo(data, currentIndex);
-            overlay.appendChild(currentVideo);
-
-            if (currentIndex < data.length - 1) {
-              const nextVideo = preloadVideo(data, currentIndex + 1);
-              nextVideo.style.display = 'none';
-              overlay.appendChild(nextVideo);
-            }
-          }
-          overlay.scrollTop = 0;
-        } else if (scrollPosition <= 0 && currentIndex > 0) {
-          currentIndex--;
-          overlay.innerHTML = '';
-          const currentVideo = preloadVideo(data, currentIndex);
-          overlay.appendChild(currentVideo);
-
-          if (currentIndex < data.length - 1) {
-            const nextVideo = preloadVideo(data, currentIndex + 1);
-            nextVideo.style.display = 'none';
-            overlay.appendChild(nextVideo);
-          }
-          overlay.scrollTop = overlayHeight;
-        }
-      });
     }
 
     function updateCarousel() {
